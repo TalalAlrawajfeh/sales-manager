@@ -15,9 +15,9 @@ public class PagedViewController {
     private static final String IS_LAST_SECTION_OF_PAGES_ATTRIBUTE = "isLastSectionOfPages";
     private static final String MIN_PAGE_NUMBER_ATTRIBUTE = "minPageNumber";
     private static final String MAX_PAGE_NUMBER_ATTRIBUTE = "maxPageNumber";
+    private static final String PAGE_ENTITIES_ATTRIBUTE = "pageEntities";
     private static final String PAGE_NUMBER_ATTRIBUTE = "pageNumber";
     private static final String SHOW_ERROR_ATTRIBUTE = "showError";
-    private static final String RECEIPTS_ATTRIBUTE = "receipts";
 
     protected int getPageNumber(Integer pageNumber) {
         int page = 1;
@@ -36,7 +36,7 @@ public class PagedViewController {
             model.put(PAGE_NUMBER_ATTRIBUTE, pageNumber);
             model.put(MIN_PAGE_NUMBER_ATTRIBUTE, minPageNumber);
             model.put(MAX_PAGE_NUMBER_ATTRIBUTE, getMaxPageNumber(totalNumberOfPages, minPageNumber));
-            model.put(RECEIPTS_ATTRIBUTE, getPageItemsList(parametersMap));
+            model.put(PAGE_ENTITIES_ATTRIBUTE, getPageItemsList(parametersMap));
         }
     }
 

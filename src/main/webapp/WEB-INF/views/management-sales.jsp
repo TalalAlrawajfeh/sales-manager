@@ -76,23 +76,16 @@
                         <th>Price</th>
                         <th>Quantity</th>
                         <th>Total</th>
-                        <th>Controls</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach items="${receipts}" var="receipt">
+                    <c:forEach items="${pageEntities}" var="receipt">
                         <tr>
                             <td>${receipt.date}</td>
                             <td>${receipt.product.code} - ${receipt.product.description}</td>
                             <td>${receipt.price.toString()}</td>
                             <td>${receipt.quantity}</td>
                             <td>${receipt.total.toString()}</td>
-                            <td>
-                                <form action="#" method="post">
-                                    <input type="hidden" name="action" value="actionName">
-                                    <a class="btn btn-danger" onclick="parentNode.submit();" role="button"> <span class="glyphicon glyphicon-trash"></span> Delete</a>
-                                </form>
-                            </td>
                         </tr>
                     </c:forEach>
                 </tbody>

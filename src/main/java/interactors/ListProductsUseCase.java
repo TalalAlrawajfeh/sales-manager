@@ -21,7 +21,7 @@ public class ListProductsUseCase implements UseCase<Map<PaginationUseCasesParame
     @Override
     public void execute(Map<PaginationUseCasesParameters, Object> parametersMap) throws UseCaseException {
         ListPaginationUseCase<Product, ProductEntity> listPaginationUseCase = new ListPaginationUseCase<>(productRepository);
-        parametersMap.put(PaginationUseCasesParameters.COMPARATOR, Comparator.<ProductEntity, String>comparing(p -> p.getCode()));
+        parametersMap.put(PaginationUseCasesParameters.COMPARATOR, Comparator.comparing(ProductEntity::getCode));
         listPaginationUseCase.execute(parametersMap);
     }
 }

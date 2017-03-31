@@ -83,7 +83,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach items="${receipts}" var="receipt">
+                    <c:forEach items="${pageEntities}" var="receipt">
                         <tr>
                             <td>${receipt.product.code} - ${receipt.product.description}</td>
                             <td>${receipt.price.toString()}</td>

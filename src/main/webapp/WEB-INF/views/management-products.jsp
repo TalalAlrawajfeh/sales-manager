@@ -27,7 +27,7 @@
                     <li><a href="#">Settings</a></li>
                     <li><a href="./sales">Sales</a></li>
                     <li class="active"><a href="./products">Products</a></li>
-                    <li><a href="./products">Add Receipt</a></li>
+                    <li><a href="./receipts">Add Receipt</a></li>
                 </ul>
             </div>
         </nav>
@@ -84,7 +84,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach items="${products}" var="product">
+                    <c:forEach items="${pageEntities}" var="product">
                         <tr>
                             <td>${product.code}</td>
                             <td>${product.description}</td>

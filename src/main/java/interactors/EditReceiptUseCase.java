@@ -45,16 +45,30 @@ public class EditReceiptUseCase implements UseCase<Receipt> {
     public void execute(Receipt receipt) throws UseCaseException {
         validateReceipt(receipt);
         Receipt oldReceipt = receiptRepository.findById(receipt.getId()).convert();
+        receipt.setDate(oldReceipt.getDate());
         receiptRepository.save(receipt.convert());
-        updateProduct(oldReceipt, receipt);
+        updateProducts(oldReceipt, receipt);
     }
 
-    private void updateProduct(Receipt oldReceipt, Receipt newReceipt) {
+    private void updateProducts(Receipt oldReceipt, Receipt newReceipt) {
+        updateOldProduct(oldReceipt);
+        updateNewProduct(newReceipt);
+    }
+
+    private void updateNewProduct(Receipt newReceipt) {
+        ProductEntity productEntity;
+        productEntity = productRepository.findByCode(newReceipt.getProduct().getCode());
+        Long newQuantity = newReceipt.getQuantity();
+        productEntity.setQuantityRemaining(productEntity.getQuantityRemaining() - newQuantity);
+        productEntity.setQuantitySold(productEntity.getQuantitySold() + newQuantity);
+        productRepository.save(productEntity);
+    }
+
+    private void updateOldProduct(Receipt oldReceipt) {
         ProductEntity productEntity = productRepository.findByCode(oldReceipt.getProduct().getCode());
         Long oldQuantity = oldReceipt.getQuantity();
-        Long newQuantity = newReceipt.getQuantity();
-        productEntity.setQuantityRemaining(productEntity.getQuantityRemaining() + oldQuantity - newQuantity);
-        productEntity.setQuantitySold(productEntity.getQuantitySold() - oldQuantity + newQuantity);
+        productEntity.setQuantityRemaining(productEntity.getQuantityRemaining() + oldQuantity);
+        productEntity.setQuantitySold(productEntity.getQuantitySold() - oldQuantity);
         productRepository.save(productEntity);
     }
 

@@ -18,6 +18,7 @@
     <bean id="deleteReceiptUseCase" class="interactors.DeleteReceiptUseCase"/>
     <bean id="editProductUseCase" class="interactors.EditProductUseCase"/>
     <bean id="listReceiptsUseCase" class="interactors.ListReceiptsUseCase"/>
+    <bean id="listProductsUseCase" class="interactors.ListProductsUseCase"/>
     <bean id="getProductUseCase" class="interactors.GetProductUseCase"/>
     <bean id="editReceiptUseCase" class="interactors.EditReceiptUseCase"/>
 

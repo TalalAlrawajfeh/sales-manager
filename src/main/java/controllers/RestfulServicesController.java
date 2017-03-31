@@ -77,13 +77,12 @@ public class RestfulServicesController {
     }
 
     private String prepareResponse(Product product) {
-        String response = "{" +
+        return "{" +
                 "\"code\"" + ":" + "\"" + product.getCode() + "\"" + "," +
                 "\"description\"" + ":" + "\"" + product.getDescription() + "\"" + "," +
                 "\"price\"" + ":" + "\"" + product.getPrice().toString() + "\"" + "," +
                 "\"quantityRemaining\"" + ":" + "\"" + product.getQuantityRemaining() + "\"" + "," +
                 "\"quantitySold\"" + ":" + "\"" + product.getQuantitySold() + "\"" +
                 "}";
-        return response;
     }
 }
