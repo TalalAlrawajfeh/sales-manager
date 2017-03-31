@@ -9,7 +9,6 @@ import interactors.DeleteProductUseCase;
 import interactors.DeleteReceiptUseCase;
 import interactors.GetProductUseCase;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,25 +63,28 @@ public class RestfulServicesController {
     }
 
     @RequestMapping(path = GET_PRODUCT_URL, method = RequestMethod.GET)
-    public ResponseEntity<JSONObject> getProductPrice() {
+    public ResponseEntity<String> getProductPrice(@RequestParam String code) {
         Map<GetProductsUseCaseParameters, Object> parametersMap = new EnumMap<>(GetProductsUseCaseParameters.class);
         try {
+            parametersMap.put(GetProductsUseCaseParameters.PRODUCT_CODE, code);
             getProductUseCase.execute(parametersMap);
         } catch (UseCaseException e) {
             logger.debug(e);
-            return new ResponseEntity<>(new JSONObject(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(prepareResponse((Product) parametersMap.get(GetProductsUseCaseParameters.PRODUCT)),
                 HttpStatus.OK);
     }
 
-    private JSONObject prepareResponse(Product product) {
-        JSONObject response = new JSONObject();
-        response.put("code", product.getCode());
-        response.put("description", product.getDescription());
-        response.put("price", product.getPrice());
-        response.put("quantityRemaining", product.getQuantityRemaining());
-        response.put("quantitySold", product.getQuantitySold());
-        return response;
+    private String prepareResponse(Product product) {
+        StringBuilder response = new StringBuilder();
+        response.append("{")
+                .append("\"code\"").append(":").append("\"").append(product.getCode()).append("\"").append(",")
+                .append("\"description\"").append(":").append("\"").append(product.getDescription()).append("\"").append(",")
+                .append("\"price\"").append(":").append("\"").append(product.getPrice().toString()).append("\"").append(",")
+                .append("\"quantityRemaining\"").append(":").append("\"").append(product.getQuantityRemaining()).append("\"").append(",")
+                .append("\"quantitySold\"").append(":").append("\"").append(product.getQuantitySold()).append("\"")
+                .append("}");
+        return response.toString();
     }
 }

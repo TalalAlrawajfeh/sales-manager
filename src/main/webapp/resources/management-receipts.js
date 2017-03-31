@@ -21,6 +21,7 @@ const errorResponseMessages = response => {
 };
 
 hideInvalidAlert();
+getProductPrice(document.getElementById('code').value);
 
 function hideInvalidAlert() {
     setElementHidden('alertInvalid', true);
@@ -68,6 +69,10 @@ function validateFieldsAndSubmit() {
     }
 }
 
+function areFieldsValid() {
+    return Object.keys(validations).filter(key => !validations[key](document.getElementById(key).value)).length === 0;
+}
+
 function submitInputForm() {
     document.getElementById('inputForm').submit();
 }
@@ -75,6 +80,17 @@ function submitInputForm() {
 function showInvalidAlert(alertContent) {
     document.getElementById('alertInvalid').innerHTML = '<strong>Error!</strong> ' + alertContent;
     setElementHidden('alertInvalid', false);
+}
+
+function calculateTotal() {
+    if(areFieldsValid) {
+        var price = parseFloat(document.getElementById('price').value);
+        var quantity = parseFloat(document.getElementById('quantity').value);
+        var total = price * quantity;
+        if(!isNaN(total) && isFinite(total)) {
+            setElementById('total', total);
+        }
+    }
 }
 
 function deleteReceipt(id) {
@@ -96,10 +112,10 @@ function getProductPrice(code) {
         dataType:"json",
         url: "./get-product?code=" + code,
         success: function(response){
-            setElementById('code', response['code']);
+            setElementById('price', response['price']);
         },
         error: function(response) {
-            alert(errorResponseMessages(response));
+            alert("An error occurred while processing request");
         }
     });
 }
