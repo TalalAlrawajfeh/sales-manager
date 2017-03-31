@@ -44,9 +44,9 @@ function setElementById(elementId, value) {
     document.getElementById(elementId).value = value;
 }
 
-function editReceipt(id, codeDescription, price, quantity, total) {
+function editReceipt(id, code, price, quantity, total) {
     setElementById('receiptId', id);
-    setElementById('codeDescription', codeDescription);
+    setElementById('code', code);
     setElementById('price', price);
     setElementById('quantity', quantity);
     setElementById('total', total);
@@ -60,7 +60,6 @@ function setModalSubmitButtonLabel(label) {
 
 function validateFieldsAndSubmit() {
     hideInvalidAlert();
-    setElementById('code', document.getElementById('codeDescription').value.split('-')[0].trim());
     var invalidInputs = Object.keys(validations).filter(key => !validations[key](document.getElementById(key).value));
     if(invalidInputs.length > 0) {
         showInvalidAlert(errorMessages[invalidInputs[0]]);
@@ -84,6 +83,20 @@ function deleteReceipt(id) {
         url: "./delete-receipt?receiptId=" + id,
         success: function(){
             location.href = "./receipts";
+        },
+        error: function(response) {
+            alert(errorResponseMessages(response));
+        }
+    });
+}
+
+function getProductPrice(code) {
+    $.ajax({
+        type: "GET",
+        dataType:"json",
+        url: "./get-product?code=" + code,
+        success: function(response){
+            setElementById('code', response['code']);
         },
         error: function(response) {
             alert(errorResponseMessages(response));

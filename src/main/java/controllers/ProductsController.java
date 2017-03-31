@@ -4,15 +4,10 @@ import adapters.UseCase;
 import beans.Pair;
 import beans.Product;
 import beans.builders.ProductBuilder;
-import exceptions.UseCaseException;
 import interactors.AddProductUseCase;
-import interactors.DeleteProductUseCase;
 import interactors.EditProductUseCase;
 import interactors.ListAllProductsUseCase;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,12 +28,9 @@ public class ProductsController {
     private static final String MANAGEMENT_PRODUCTS_VIEW_NAME = "management-products";
     private static final String SHOW_ERROR_ATTRIBUTE_NAME = "showError";
     private static final String PRODUCTS_ATTRIBUTE_NAME = "products";
-    private static final String DELETE_PRODUCT_URL = "/delete-product";
     private static final String PRODUCTS_URL = "/products";
     private static final String EDIT_ACTION = "edit";
     private static final String ADD_ACTION = "add";
-
-    private final Logger logger = Logger.getLogger(ProductsController.class);
 
     @Autowired
     private ListAllProductsUseCase listAllProductsUseCase;
@@ -48,9 +40,6 @@ public class ProductsController {
 
     @Autowired
     private EditProductUseCase editProductUseCase;
-
-    @Autowired
-    private DeleteProductUseCase deleteProductUseCase;
 
     private Map<String, UseCase<Pair<String, Product>>> actionUseCaseMap = new HashMap<>();
 
@@ -88,17 +77,6 @@ public class ProductsController {
                 .executeUseCaseAndBuild();
         addProductsToModelAndView(modelAndView);
         return modelAndView;
-    }
-
-    @RequestMapping(path = DELETE_PRODUCT_URL, method = RequestMethod.DELETE)
-    public ResponseEntity<HttpStatus> deleteProduct(@RequestParam String code) {
-        try {
-            deleteProductUseCase.execute(new ProductBuilder().setCode(code).build());
-        } catch (UseCaseException e) {
-            logger.debug(e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void addProductsToModelAndView(ModelAndView modelAndView) {

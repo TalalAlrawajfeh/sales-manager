@@ -42,6 +42,32 @@
                 </div>
             </c:if>
 
+            <c:if test="${not empty minPageNumber and minPageNumber ge 1}">
+                <ul class="pagination pagination-lg">
+                    <c:if test="${minPageNumber > 1}">
+                        <li>
+                            <a href="./sales?pageNumber=${minPageNumber - 1}">
+                                <span>&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                    </c:if>
+                    <c:forEach var="i" begin="${minPageNumber}" end="${maxPageNumber}">
+                        <li <c:if test="${pageNumber eq i}">class="active"</c:if>>
+                            <a href="./sales?pageNumber=${i}">${i}</a>
+                        </li>
+                    </c:forEach>
+                    <c:if test="${isLastSectionOfPages eq false}">
+                        <li>
+                            <a href="./sales?pageNumber=${maxPageNumber + 1}">
+                                <span>&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    </c:if>
+                </ul>
+            </c:if>
+
             <button type="button" class="btn btn-primary" onclick="addReceipt();">Add New Receipt</button>
 
             <table class="table table-striped">
@@ -62,7 +88,7 @@
                             <td>${receipt.quantity}</td>
                             <td>${receipt.total.toString()}</td>
                             <td>
-                                <a class="btn btn-info" onclick="editReceipt('${receipt.id}', '${receipt.product.code} - ${receipt.product.description}', '${receipt.price.toString()}', '${receipt.quantity}', '${receipt.total.toString()}');"> <span class="glyphicon glyphicon-pencil"></span> Edit</a>
+                                <a class="btn btn-info" onclick="editReceipt('${receipt.id}', '${receipt.product.code}', '${receipt.price.toString()}', '${receipt.quantity}', '${receipt.total.toString()}');"> <span class="glyphicon glyphicon-pencil"></span> Edit</a>
                                 <a class="btn btn-danger" onclick="deleteReceipt('${receipt.id}');"> <span class="glyphicon glyphicon-trash"></span> Delete</a>
                             </td>
                         </tr>
@@ -81,7 +107,6 @@
                             <form id="inputForm" action="./receipts" method="post">
                                 <input type="hidden" id="action" name="action">
                                 <input type="hidden" id="receiptId" name="receiptId" value="">
-                                <input type="hidden" id="code" name="code">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div id="alertInvalid" class="alert alert-warning">
@@ -92,10 +117,10 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <label>Code:</label>
-                                        <label for="codeDescription">Product:</label>
-                                        <select class="form-control" id="codeDescription" name="codeDescription">
+                                        <label for="code">Product:</label>
+                                        <select class="form-control" id="code" name="code">
                                             <c:forEach items="${products}" var="product">
-                                                <option>${product.code} - ${product.description}</option>
+                                                <option value="${product.code}">${product.code} - ${product.description}</option>
                                             </c:forEach>
                                         </select>
                                     </div>

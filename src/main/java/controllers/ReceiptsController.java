@@ -34,12 +34,9 @@ public class ReceiptsController {
     private static final String SHOW_ERROR_ATTRIBUTE_NAME = "showError";
     private static final String RECEIPTS_ATTRIBUTE_NAME = "receipts";
     private static final String PRODUCTS_ATTRIBUTE_NAME = "products";
-    private static final String DELETE_RECEIPT_URL = "/delete-receipt";
     private static final String RECEIPTS_URL = "/receipts";
     private static final String EDIT_ACTION = "edit";
     private static final String ADD_ACTION = "add";
-
-    private final Logger logger = Logger.getLogger(ReceiptsController.class);
 
     @Autowired
     private ListAllReceiptsUseCase listAllReceiptsUseCase;
@@ -49,9 +46,6 @@ public class ReceiptsController {
 
     @Autowired
     private AddReceiptUseCase addReceiptUseCase;
-
-    @Autowired
-    private DeleteReceiptUseCase deleteReceiptUseCase;
 
     private UseCase<Pair<List<Receipt>, List<Product>>> listAllReceiptsAndProductsUseCase = p -> {
         listAllReceiptsUseCase.execute(p.getFirst());
@@ -103,17 +97,6 @@ public class ReceiptsController {
                 .executeUseCaseAndBuild();
         addReceiptsAndProductsToModelAndView(modelAndView);
         return modelAndView;
-    }
-
-    @RequestMapping(path = DELETE_RECEIPT_URL, method = RequestMethod.DELETE)
-    public ResponseEntity<HttpStatus> deleteReceipt(@RequestParam Long receiptId) {
-        try {
-            deleteReceiptUseCase.execute(new ReceiptBuilder().setId(receiptId).build());
-        } catch (UseCaseException e) {
-            logger.debug(e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void addReceiptsAndProductsToModelAndView(ModelAndView modelAndView) {

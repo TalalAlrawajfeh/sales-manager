@@ -34,6 +34,12 @@
             <h2>Sales</h2>
             <p>All sales from newest to oldest:</p>
 
+            <c:if test="${showError == true}">
+                <div class="alert alert-danger">
+                    <strong>Error!</strong> ${errorMessage}
+                </div>
+            </c:if>
+
             <c:if test="${not empty minPageNumber and minPageNumber ge 1}">
                 <ul class="pagination pagination-lg">
                     <c:if test="${minPageNumber > 1}">
@@ -82,7 +88,6 @@
                             <td>
                                 <form action="#" method="post">
                                     <input type="hidden" name="action" value="actionName">
-                                    <a class="btn btn-info" onclick="parentNode.submit();" role="button"> <span class="glyphicon glyphicon-pencil"></span> Edit</a>
                                     <a class="btn btn-danger" onclick="parentNode.submit();" role="button"> <span class="glyphicon glyphicon-trash"></span> Delete</a>
                                 </form>
                             </td>

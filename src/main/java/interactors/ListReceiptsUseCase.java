@@ -17,7 +17,7 @@ import java.util.stream.StreamSupport;
  * Created by u624 on 3/30/17.
  */
 public class ListReceiptsUseCase implements UseCase<Map<PaginationUseCasesParameters, Object>> {
-    private static final int PAGE_SIZE = 3; //TODO:RESET TO 50
+    private static final int PAGE_SIZE = 50;
 
     @Autowired
     private ReceiptRepository receiptRepository;
