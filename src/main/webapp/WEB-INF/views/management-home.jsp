@@ -24,7 +24,7 @@
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="./management-home">Home</a></li>
                     <li><a href="#">Settings</a></li>
-                    <li><a href="#">Sales</a></li>
+                    <li><a href="./sales">Sales</a></li>
                     <li><a href="./products">Products</a></li>
                     <li><a href="./receipts">Add Receipt</a></li>
                 </ul>

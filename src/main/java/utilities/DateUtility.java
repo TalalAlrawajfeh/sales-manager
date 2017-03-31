@@ -11,8 +11,8 @@ import java.util.TimeZone;
  * Created by u624 on 3/31/17.
  */
 public class DateUtility {
-    private static final String DATE_FORMAT = "dd-MM-YYYY HH:mm:ss";
-    private static final String TIME_ZONE = "GMT";
+    private static final String DATE_FORMAT = "dd-MM-yyyy HH:mm:ss";
+    private static final String TIME_ZONE = "UTC";
 
     public static String formatDate(Date date) {
         return getSimpleDateFormat().format(date);

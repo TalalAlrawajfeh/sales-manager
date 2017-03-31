@@ -17,6 +17,7 @@
     <bean id="deleteProductUseCase" class="interactors.DeleteProductUseCase"/>
     <bean id="deleteReceiptUseCase" class="interactors.DeleteReceiptUseCase"/>
     <bean id="editProductUseCase" class="interactors.EditProductUseCase"/>
+    <bean id="listReceiptsUseCase" class="interactors.ListReceiptsUseCase"/>
 
     <bean id="firstTimeUser" class="initializers.FirstTimeAdminInitializer" init-method="init"/>
 </beans>

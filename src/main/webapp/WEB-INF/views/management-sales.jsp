@@ -21,39 +21,44 @@
             <div class="container-fluid">
                 <div class="navbar-header"> <a class="navbar-brand" href="#">Pages</a> </div>
                 <ul class="nav navbar-nav">
-                    <li><a href="#">Home</a></li>
+                    <li><a href="./management-home">Home</a></li>
                     <li><a href="#">Settings</a></li>
-                    <li class="active"><a href="#">Sales</a></li>
-                    <li><a href="#">Products</a></li>
-                    <li><a href="#">Add Receipt</a></li>
+                    <li class="active"><a href="./sales">Sales</a></li>
+                    <li><a href="./products">Products</a></li>
+                    <li><a href="./receipts">Add Receipt</a></li>
                 </ul>
             </div>
         </nav>
- <div class="container">
+
+        <div class="container">
             <h2>Sales</h2>
             <p>All sales from newest to oldest:</p>
 
- 			<nav aria-label="Page Navigation">
- 			  <ul class="pagination">
- 			    <li class="page-item">
- 			      <a class="page-link" href="#" aria-label="Previous">
- 			        <span aria-hidden="true">&laquo;</span>
- 			        <span class="sr-only">Previous</span>
- 			      </a>
- 			    </li>
- 			    <li class="page-item"><a class="page-link" href="#">1</a></li>
- 			    <li class="page-item"><a class="page-link" href="#">2</a></li>
- 			    <li class="page-item"><a class="page-link" href="#">3</a></li>
- 			    <li class="page-item"><a class="page-link" href="#">4</a></li>
- 			    <li class="page-item"><a class="page-link" href="#">5</a></li>
- 			    <li class="page-item">
- 			      <a class="page-link" href="#" aria-label="Next">
- 			        <span aria-hidden="true">&raquo;</span>
- 			        <span class="sr-only">Next</span>
- 			      </a>
- 			    </li>
- 			  </ul>
- 			</nav>
+            <c:if test="${not empty minPageNumber and minPageNumber ge 1}">
+                <ul class="pagination pagination-lg">
+                    <c:if test="${minPageNumber > 1}">
+                        <li>
+                            <a href="./sales?pageNumber=${minPageNumber - 1}">
+                                <span>&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                        </li>
+                    </c:if>
+                    <c:forEach var="i" begin="${minPageNumber}" end="${maxPageNumber}">
+                        <li <c:if test="${pageNumber eq i}">class="active"</c:if>>
+                            <a href="./sales?pageNumber=${i}">${i}</a>
+                        </li>
+                    </c:forEach>
+                    <c:if test="${isLastSectionOfPages eq false}">
+                        <li>
+                            <a href="./sales?pageNumber=${maxPageNumber + 1}">
+                                <span>&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </li>
+                    </c:if>
+                </ul>
+            </c:if>
 
             <table class="table table-striped">
                 <thead>
@@ -67,20 +72,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>2/10/2017 6:43 PM</td>
-                        <td>12345</td>
-                        <td>$25</td>
-                        <td>3</td>
-                        <td>$75</td>
-                        <td>
-                            <form action="#" method="post">
-                                <input type="hidden" name="action" value="actionName">
-                                <a class="btn btn-info" onclick="parentNode.submit();" role="button"> <span class="glyphicon glyphicon-pencil"></span> Edit</a>
-                                <a class="btn btn-danger" onclick="parentNode.submit();" role="button"> <span class="glyphicon glyphicon-trash"></span> Delete</a>
-                            </form>
-                        </td>
-                    </tr>
+                    <c:forEach items="${receipts}" var="receipt">
+                        <tr>
+                            <td>${receipt.date}</td>
+                            <td>${receipt.product.code} - ${receipt.product.description}</td>
+                            <td>${receipt.price.toString()}</td>
+                            <td>${receipt.quantity}</td>
+                            <td>${receipt.total.toString()}</td>
+                            <td>
+                                <form action="#" method="post">
+                                    <input type="hidden" name="action" value="actionName">
+                                    <a class="btn btn-info" onclick="parentNode.submit();" role="button"> <span class="glyphicon glyphicon-pencil"></span> Edit</a>
+                                    <a class="btn btn-danger" onclick="parentNode.submit();" role="button"> <span class="glyphicon glyphicon-trash"></span> Delete</a>
+                                </form>
+                            </td>
+                        </tr>
+                    </c:forEach>
                 </tbody>
             </table>
         </div>
