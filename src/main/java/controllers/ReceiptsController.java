@@ -6,15 +6,11 @@ import beans.Product;
 import beans.Receipt;
 import beans.builders.ProductBuilder;
 import beans.builders.ReceiptBuilder;
-import exceptions.UseCaseException;
+import constants.PaginationUseCasesParameters;
 import interactors.AddReceiptUseCase;
-import interactors.DeleteReceiptUseCase;
 import interactors.ListAllProductsUseCase;
-import interactors.ListAllReceiptsUseCase;
-import org.apache.log4j.Logger;
+import interactors.ListReceiptsUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +25,7 @@ import java.util.*;
  * Created by u624 on 3/25/17.
  */
 @Controller
-public class ReceiptsController {
+public class ReceiptsController extends PagedViewController {
     private static final String MANAGEMENT_RECEIPTS_VIEW_NAME = "management-receipts";
     private static final String SHOW_ERROR_ATTRIBUTE_NAME = "showError";
     private static final String RECEIPTS_ATTRIBUTE_NAME = "receipts";
@@ -39,7 +35,7 @@ public class ReceiptsController {
     private static final String ADD_ACTION = "add";
 
     @Autowired
-    private ListAllReceiptsUseCase listAllReceiptsUseCase;
+    private ListReceiptsUseCase listReceiptsUseCase;
 
     @Autowired
     private ListAllProductsUseCase listAllProductsUseCase;
@@ -47,8 +43,8 @@ public class ReceiptsController {
     @Autowired
     private AddReceiptUseCase addReceiptUseCase;
 
-    private UseCase<Pair<List<Receipt>, List<Product>>> listAllReceiptsAndProductsUseCase = p -> {
-        listAllReceiptsUseCase.execute(p.getFirst());
+    private UseCase<Pair<Map<PaginationUseCasesParameters, Object>, List<Product>>> listAllReceiptsAndProductsUseCase = p -> {
+        listReceiptsUseCase.execute(p.getFirst());
         listAllProductsUseCase.execute(p.getSecond());
     };
 
@@ -67,19 +63,22 @@ public class ReceiptsController {
     }
 
     @RequestMapping(path = RECEIPTS_URL, method = RequestMethod.GET)
-    public ModelAndView getReceiptsModelAndView() {
-        List<Receipt> receipts = new ArrayList<>();
+    public ModelAndView getReceiptsModelAndView(Integer pageNumber) {
+        int page = getPageNumber(pageNumber);
         List<Product> products = new ArrayList<>();
         Map<String, Object> modelMap = new HashMap<>();
-        modelMap.put(RECEIPTS_ATTRIBUTE_NAME, receipts);
         modelMap.put(PRODUCTS_ATTRIBUTE_NAME, products);
-        return new UseCaseModelAndViewBuilder<Pair<List<Receipt>, List<Product>>>()
+        Map<PaginationUseCasesParameters, Object> parametersMap = new EnumMap<>(PaginationUseCasesParameters.class);
+        parametersMap.put(PaginationUseCasesParameters.PAGE_NUMBER, page);
+        ModelAndView modelAndView = new UseCaseModelAndViewBuilder<Pair<Map<PaginationUseCasesParameters, Object>, List<Product>>>()
                 .setUseCase(listAllReceiptsAndProductsUseCase)
-                .setUseCaseParameter(new Pair<>(receipts, products))
+                .setUseCaseParameter(new Pair<>(parametersMap, products))
                 .setSuccessViewName(MANAGEMENT_RECEIPTS_VIEW_NAME)
                 .setErrorViewName(MANAGEMENT_RECEIPTS_VIEW_NAME)
                 .setModelMap(modelMap)
                 .executeUseCaseAndBuild();
+        addModelPaginationAttributes(page, parametersMap, modelAndView);
+        return modelAndView;
     }
 
     @RequestMapping(path = RECEIPTS_URL, method = RequestMethod.POST)
@@ -100,7 +99,7 @@ public class ReceiptsController {
     }
 
     private void addReceiptsAndProductsToModelAndView(ModelAndView modelAndView) {
-        Map<String, Object> receiptsModel = getReceiptsModelAndView().getModel();
+        Map<String, Object> receiptsModel = getReceiptsModelAndView(1).getModel();
         if (!(boolean) receiptsModel.get(SHOW_ERROR_ATTRIBUTE_NAME)) {
             Map<String, Object> model = modelAndView.getModel();
             model.put(RECEIPTS_ATTRIBUTE_NAME,
