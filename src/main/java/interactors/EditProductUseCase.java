@@ -38,7 +38,9 @@ public class EditProductUseCase implements UseCase<Pair<String, Product>> {
     public void execute(Pair<String, Product> oldCodeProductPair) throws UseCaseException {
         Product product = oldCodeProductPair.getSecond();
         prepareAndValidateProduct(oldCodeProductPair, product);
-        deleteOldProductEntity();
+        if (!oldCodeProductPair.getFirst().equals(oldCodeProductPair.getSecond().getCode())) {
+            deleteOldProductEntity();
+        }
         productRepository.save(product.convert());
     }
 
@@ -84,7 +86,8 @@ public class EditProductUseCase implements UseCase<Pair<String, Product>> {
     private void initializeRepositoryValidationsMessagesMap() {
         repositoryValidationsMessagesMap.put(p -> Objects.nonNull(productEntity),
                 "Product doesn't exist");
-        repositoryValidationsMessagesMap.put(p -> receiptRepository.findByProductEntity(productEntity).isEmpty(),
+        repositoryValidationsMessagesMap.put(p -> p.getFirst().equals(p.getSecond().getCode())
+                        || receiptRepository.findByProductEntity(productEntity).isEmpty(),
                 "There are receipts that depend on this product");
         repositoryValidationsMessagesMap.put(p -> p.getFirst().equals(p.getSecond().getCode())
                         || Objects.isNull(productRepository.findByCode(p.getSecond().getCode())),

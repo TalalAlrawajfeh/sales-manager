@@ -14,6 +14,10 @@ public class DateUtility {
     private static final String DATE_FORMAT = "dd-MM-yyyy HH:mm:ss";
     private static final String TIME_ZONE = "UTC";
 
+    private DateUtility() {
+        /* static class */
+    }
+
     public static String formatDate(Date date) {
         return getSimpleDateFormat().format(date);
     }

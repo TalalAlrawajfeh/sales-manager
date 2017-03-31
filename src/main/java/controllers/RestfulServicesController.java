@@ -77,14 +77,13 @@ public class RestfulServicesController {
     }
 
     private String prepareResponse(Product product) {
-        StringBuilder response = new StringBuilder();
-        response.append("{")
-                .append("\"code\"").append(":").append("\"").append(product.getCode()).append("\"").append(",")
-                .append("\"description\"").append(":").append("\"").append(product.getDescription()).append("\"").append(",")
-                .append("\"price\"").append(":").append("\"").append(product.getPrice().toString()).append("\"").append(",")
-                .append("\"quantityRemaining\"").append(":").append("\"").append(product.getQuantityRemaining()).append("\"").append(",")
-                .append("\"quantitySold\"").append(":").append("\"").append(product.getQuantitySold()).append("\"")
-                .append("}");
-        return response.toString();
+        String response = "{" +
+                "\"code\"" + ":" + "\"" + product.getCode() + "\"" + "," +
+                "\"description\"" + ":" + "\"" + product.getDescription() + "\"" + "," +
+                "\"price\"" + ":" + "\"" + product.getPrice().toString() + "\"" + "," +
+                "\"quantityRemaining\"" + ":" + "\"" + product.getQuantityRemaining() + "\"" + "," +
+                "\"quantitySold\"" + ":" + "\"" + product.getQuantitySold() + "\"" +
+                "}";
+        return response;
     }
 }

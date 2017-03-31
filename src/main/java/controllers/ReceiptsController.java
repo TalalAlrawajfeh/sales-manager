@@ -8,6 +8,7 @@ import beans.builders.ProductBuilder;
 import beans.builders.ReceiptBuilder;
 import constants.PaginationUseCasesParameters;
 import interactors.AddReceiptUseCase;
+import interactors.EditReceiptUseCase;
 import interactors.ListAllProductsUseCase;
 import interactors.ListReceiptsUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,6 @@ import java.util.*;
 @Controller
 public class ReceiptsController extends PagedViewController {
     private static final String MANAGEMENT_RECEIPTS_VIEW_NAME = "management-receipts";
-    private static final String SHOW_ERROR_ATTRIBUTE_NAME = "showError";
-    private static final String RECEIPTS_ATTRIBUTE_NAME = "receipts";
     private static final String PRODUCTS_ATTRIBUTE_NAME = "products";
     private static final String RECEIPTS_URL = "/receipts";
     private static final String EDIT_ACTION = "edit";
@@ -42,6 +41,9 @@ public class ReceiptsController extends PagedViewController {
 
     @Autowired
     private AddReceiptUseCase addReceiptUseCase;
+
+    @Autowired
+    private EditReceiptUseCase editReceiptUseCase;
 
     private UseCase<Pair<Map<PaginationUseCasesParameters, Object>, List<Product>>> listAllReceiptsAndProductsUseCase = p -> {
         listReceiptsUseCase.execute(p.getFirst());
@@ -58,7 +60,7 @@ public class ReceiptsController extends PagedViewController {
         actionUseCaseMap.put(EDIT_ACTION, p -> {
             Receipt receipt = p.getSecond();
             receipt.setId(p.getFirst());
-            addReceiptUseCase.execute(receipt);
+            editReceiptUseCase.execute(receipt);
         });
     }
 
@@ -99,13 +101,8 @@ public class ReceiptsController extends PagedViewController {
     }
 
     private void addReceiptsAndProductsToModelAndView(ModelAndView modelAndView) {
-        Map<String, Object> receiptsModel = getReceiptsModelAndView(1).getModel();
-        if (!(boolean) receiptsModel.get(SHOW_ERROR_ATTRIBUTE_NAME)) {
-            Map<String, Object> model = modelAndView.getModel();
-            model.put(RECEIPTS_ATTRIBUTE_NAME,
-                    receiptsModel.get(RECEIPTS_ATTRIBUTE_NAME));
-            model.put(PRODUCTS_ATTRIBUTE_NAME,
-                    receiptsModel.get(PRODUCTS_ATTRIBUTE_NAME));
+        if (isShowErrorAttributeFalse(modelAndView)) {
+            modelAndView.getModel().putAll(getReceiptsModelAndView(1).getModel());
         }
     }
 }

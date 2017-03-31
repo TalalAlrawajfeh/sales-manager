@@ -27,7 +27,7 @@
                     <li><a href="#">Settings</a></li>
                     <li><a href="./sales">Sales</a></li>
                     <li class="active"><a href="./products">Products</a></li>
-                    <li><a href="./receipts">Add Receipt</a></li>
+                    <li><a href="./products">Add Receipt</a></li>
                 </ul>
             </div>
         </nav>
@@ -39,6 +39,34 @@
             <c:if test="${showError == true}">
                 <div class="alert alert-danger">
                     <strong>Error!</strong> ${errorMessage}
+                </div>
+            </c:if>
+
+            <c:if test="${not empty minPageNumber and minPageNumber ge 1}">
+                <div>
+                    <ul class="pagination pagination-lg">
+                        <c:if test="${minPageNumber > 1}">
+                            <li>
+                                <a href="./products?pageNumber=${minPageNumber - 1}">
+                                    <span>&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                        </c:if>
+                        <c:forEach var="i" begin="${minPageNumber}" end="${maxPageNumber}">
+                            <li <c:if test="${pageNumber eq i}">class="active"</c:if>>
+                                <a href="./products?pageNumber=${i}">${i}</a>
+                            </li>
+                        </c:forEach>
+                        <c:if test="${isLastSectionOfPages eq false}">
+                            <li>
+                                <a href="./products?pageNumber=${maxPageNumber + 1}">
+                                    <span>&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                        </c:if>
+                    </ul>
                 </div>
             </c:if>
 

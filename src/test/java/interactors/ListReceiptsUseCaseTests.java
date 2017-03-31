@@ -46,7 +46,7 @@ public class ListReceiptsUseCaseTests {
 
     @Test
     public void GivenPageNumberGreaterThanNumberOfPagesThenPageItemsListShouldBeEmpty() throws Exception {
-        Mockito.doReturn(Arrays.asList(new ReceiptEntityBuilder()
+        Mockito.doReturn(Collections.singletonList(new ReceiptEntityBuilder()
                 .setDate("01-01-2017 00:00:00")
                 .build())).when(receiptRepository).findAll();
         executeListReceiptsUseCase(2);

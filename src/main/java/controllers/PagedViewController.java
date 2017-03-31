@@ -40,6 +40,10 @@ public class PagedViewController {
         }
     }
 
+    protected boolean isShowErrorAttributeFalse(ModelAndView modelAndView) {
+        return !(boolean) modelAndView.getModel().get(SHOW_ERROR_ATTRIBUTE);
+    }
+
     private <T> List<T> getPageItemsList(Map<PaginationUseCasesParameters, Object> parametersMap) {
         return (List<T>) parametersMap.get(PaginationUseCasesParameters.PAGE_ITEMS_LIST);
     }
@@ -63,9 +67,4 @@ public class PagedViewController {
     private int getPagesSection(int pageNumber) {
         return (int) Math.floor((float) (pageNumber - 1) / (float) SECTION_LENGTH);
     }
-
-    private boolean isShowErrorAttributeFalse(ModelAndView modelAndView) {
-        return !(boolean) modelAndView.getModel().get(SHOW_ERROR_ATTRIBUTE);
-    }
-
 }

@@ -4,9 +4,10 @@ import adapters.UseCase;
 import beans.Pair;
 import beans.Product;
 import beans.builders.ProductBuilder;
+import constants.PaginationUseCasesParameters;
 import interactors.AddProductUseCase;
 import interactors.EditProductUseCase;
-import interactors.ListAllProductsUseCase;
+import interactors.ListProductsUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,25 +16,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created by u624 on 3/25/17.
  */
 @Controller
-public class ProductsController {
+public class ProductsController extends PagedViewController {
     private static final String MANAGEMENT_PRODUCTS_VIEW_NAME = "management-products";
-    private static final String SHOW_ERROR_ATTRIBUTE_NAME = "showError";
-    private static final String PRODUCTS_ATTRIBUTE_NAME = "products";
     private static final String PRODUCTS_URL = "/products";
     private static final String EDIT_ACTION = "edit";
     private static final String ADD_ACTION = "add";
 
     @Autowired
-    private ListAllProductsUseCase listAllProductsUseCase;
+    private ListProductsUseCase listProductsUseCase;
 
     @Autowired
     private AddProductUseCase addProductUseCase;
@@ -49,17 +47,18 @@ public class ProductsController {
     }
 
     @RequestMapping(path = PRODUCTS_URL, method = RequestMethod.GET)
-    public ModelAndView getProductsModelAndView() {
-        List<Product> products = new ArrayList<>();
-        Map<String, Object> modelMap = new HashMap<>();
-        modelMap.put(PRODUCTS_ATTRIBUTE_NAME, products);
-        return new UseCaseModelAndViewBuilder<List<Product>>()
-                .setUseCase(listAllProductsUseCase)
-                .setUseCaseParameter(products)
+    public ModelAndView getProductsModelAndView(Integer pageNumber) {
+        int page = getPageNumber(pageNumber);
+        Map<PaginationUseCasesParameters, Object> parametersMap = new EnumMap<>(PaginationUseCasesParameters.class);
+        parametersMap.put(PaginationUseCasesParameters.PAGE_NUMBER, page);
+        ModelAndView modelAndView = new UseCaseModelAndViewBuilder<Map<PaginationUseCasesParameters, Object>>()
+                .setUseCase(listProductsUseCase)
+                .setUseCaseParameter(parametersMap)
                 .setSuccessViewName(MANAGEMENT_PRODUCTS_VIEW_NAME)
                 .setErrorViewName(MANAGEMENT_PRODUCTS_VIEW_NAME)
-                .setModelMap(modelMap)
                 .executeUseCaseAndBuild();
+        addModelPaginationAttributes(page, parametersMap, modelAndView);
+        return modelAndView;
     }
 
     @RequestMapping(path = PRODUCTS_URL, method = RequestMethod.POST)
@@ -80,10 +79,8 @@ public class ProductsController {
     }
 
     private void addProductsToModelAndView(ModelAndView modelAndView) {
-        Map<String, Object> model = getProductsModelAndView().getModel();
-        if (!(boolean) model.get(SHOW_ERROR_ATTRIBUTE_NAME)) {
-            modelAndView.getModel().put(PRODUCTS_ATTRIBUTE_NAME,
-                    model.get(PRODUCTS_ATTRIBUTE_NAME));
+        if (isShowErrorAttributeFalse(modelAndView)) {
+            modelAndView.getModel().putAll(getProductsModelAndView(1).getModel());
         }
     }
 }

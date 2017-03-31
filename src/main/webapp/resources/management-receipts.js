@@ -21,7 +21,11 @@ const errorResponseMessages = response => {
 };
 
 hideInvalidAlert();
-getProductPrice(document.getElementById('code').value);
+
+var productCode = document.getElementById('code').value;
+if('' != productCode) {
+    getProductPrice(productCode);
+}
 
 function hideInvalidAlert() {
     setElementHidden('alertInvalid', true);
