@@ -24,7 +24,7 @@ public class AddProductUseCase implements UseCase<Product> {
     public AddProductUseCase() {
         productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getCode()) && p.getCode().matches("[A-Z0-9]+"),
                 "The code field is not valid");
-        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getDescription()) && p.getCode().matches(".*[\\w]+.*"),
+        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getDescription()) && p.getDescription().matches(".*[\\w]+.*"),
                 "The code field is not valid");
         productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getPrice()),
                 "The price field is not valid");
