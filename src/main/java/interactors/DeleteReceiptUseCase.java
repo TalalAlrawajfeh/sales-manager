@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import persistence.ProductRepository;
 import persistence.ReceiptRepository;
 
+import java.util.Objects;
+
 /**
  * Created by u624 on 3/25/17.
  */
@@ -21,8 +23,16 @@ public class DeleteReceiptUseCase implements UseCase<Receipt> {
 
     @Override
     public void execute(Receipt receipt) throws UseCaseException {
-        updateProduct(receiptRepository.findById(receipt.getId()));
+        ReceiptEntity receiptEntity = receiptRepository.findById(receipt.getId());
+        ensureReceiptExist(receiptEntity);
+        updateProduct(receiptEntity);
         receiptRepository.delete(receipt.convert());
+    }
+
+    private void ensureReceiptExist(ReceiptEntity receiptEntity) throws UseCaseException {
+        if (Objects.isNull(receiptEntity)) {
+            throw new UseCaseException("Receipt doesn't exist");
+        }
     }
 
     private void updateProduct(ReceiptEntity receiptEntity) {

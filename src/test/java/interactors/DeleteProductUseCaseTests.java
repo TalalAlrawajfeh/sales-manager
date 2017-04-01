@@ -9,6 +9,7 @@ import exceptions.UseCaseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -60,7 +61,7 @@ public class DeleteProductUseCaseTests {
         Mockito.doAnswer(invocationOnMock -> {
             productEntities.remove(invocationOnMock.getArguments()[0]);
             return null;
-        }).when(productRepository).delete(productEntity);
+        }).when(productRepository).delete(Matchers.<ProductEntity>any());
         deleteProductUseCase.execute(productEntity.convert());
         assertEquals(0, productEntities.size());
     }
