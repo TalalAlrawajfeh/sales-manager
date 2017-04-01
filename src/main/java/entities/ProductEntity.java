@@ -87,4 +87,38 @@ public class ProductEntity implements Serializable, Convertable<Product> {
                 .setQuantitySold(quantitySold)
                 .build();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ProductEntity that = (ProductEntity) o;
+        if (code != null ? !code.equals(that.code) : that.code != null) {
+            return false;
+        }
+        if (description != null ? !description.equals(that.description) : that.description != null) {
+            return false;
+        }
+        if (price != null ? !price.equals(that.price) : that.price != null) {
+            return false;
+        }
+        if (quantityRemaining != null ? !quantityRemaining.equals(that.quantityRemaining) : that.quantityRemaining != null) {
+            return false;
+        }
+        return quantitySold != null ? quantitySold.equals(that.quantitySold) : that.quantitySold == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = code != null ? code.hashCode() : 0;
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (price != null ? price.hashCode() : 0);
+        result = 31 * result + (quantityRemaining != null ? quantityRemaining.hashCode() : 0);
+        result = 31 * result + (quantitySold != null ? quantitySold.hashCode() : 0);
+        return result;
+    }
 }
