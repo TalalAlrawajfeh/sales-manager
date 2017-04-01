@@ -1,6 +1,7 @@
 package interactors;
 
 import adapters.UseCase;
+import beans.Pair;
 import beans.Receipt;
 import entities.ProductEntity;
 import exceptions.UseCaseException;
@@ -8,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import persistence.ProductRepository;
 import persistence.ReceiptRepository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 /**
@@ -26,19 +24,19 @@ public class AddReceiptUseCase implements UseCase<Receipt> {
 
     private Map<Predicate<Receipt>, String> receiptsValidationsMessagesMap = new HashMap<>();
 
+    private List<Pair<Predicate<Receipt>, String>> validations = new ArrayList<>();
+
     public AddReceiptUseCase() {
-        receiptsValidationsMessagesMap.put(r -> Objects.nonNull(r.getProduct().getCode()) && r.getProduct().getCode().matches("[A-Z0-9]+"),
-                "The code field is not valid");
-        receiptsValidationsMessagesMap.put(r -> Objects.nonNull(r.getPrice()),
-                "The price field is not valid");
-        receiptsValidationsMessagesMap.put(r -> Objects.nonNull(r.getQuantity()),
-                "The quantity field is not valid");
-        receiptsValidationsMessagesMap.put(r -> Objects.nonNull(productRepository.findByCode(r.getProduct().getCode())),
-                "Product doesn't exist");
-        receiptsValidationsMessagesMap.put(r -> productRepository.findByCode(r.getProduct().getCode()).getQuantityRemaining() >= r.getQuantity(),
-                "Product quantity remaining is not sufficient");
-        receiptsValidationsMessagesMap.put(r -> Objects.isNull(r.getId()) || Objects.nonNull(receiptRepository.findById(r.getId())),
-                "Invalid ID or receipt doesn't exist");
+        validations.add(new Pair<>(r -> Objects.nonNull(r.getProduct().getCode()) && r.getProduct().getCode().matches("[A-Z0-9]+"),
+                "The code field is not valid"));
+        validations.add(new Pair<>(r -> Objects.nonNull(r.getPrice()),
+                "The price field is not valid"));
+        validations.add(new Pair<>(r -> Objects.nonNull(r.getQuantity()),
+                "The quantity field is not valid"));
+        validations.add(new Pair<>(r -> Objects.nonNull(productRepository.findByCode(r.getProduct().getCode())),
+                "Product doesn't exist"));
+        validations.add(new Pair<>(r -> productRepository.findByCode(r.getProduct().getCode()).getQuantityRemaining() >= r.getQuantity(),
+                "Product quantity remaining is not sufficient"));
     }
 
     @Override
@@ -57,12 +55,13 @@ public class AddReceiptUseCase implements UseCase<Receipt> {
     }
 
     private void validateReceipt(Receipt receipt) throws UseCaseException {
-        Optional<Map.Entry<Predicate<Receipt>, String>> entry = receiptsValidationsMessagesMap.entrySet()
+        Optional<Pair<Predicate<Receipt>, String>> entry = validations
                 .stream()
-                .filter(e -> !e.getKey().test(receipt))
+                .sequential()
+                .filter(p -> !p.getFirst().test(receipt))
                 .findAny();
         if (entry.isPresent()) {
-            throw new UseCaseException(entry.get().getValue());
+            throw new UseCaseException(entry.get().getSecond());
         }
     }
 }

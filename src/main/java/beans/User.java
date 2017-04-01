@@ -50,4 +50,30 @@ public class User implements Serializable, Convertable<UserEntity> {
                 .setPasswordHashCode(passwordHashCode)
                 .build();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        User user = (User) o;
+        if (username != null ? !username.equals(user.username) : user.username != null) {
+            return false;
+        }
+        if (fullName != null ? !fullName.equals(user.fullName) : user.fullName != null) {
+            return false;
+        }
+        return passwordHashCode != null ? passwordHashCode.equals(user.passwordHashCode) : user.passwordHashCode == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = username != null ? username.hashCode() : 0;
+        result = 31 * result + (fullName != null ? fullName.hashCode() : 0);
+        result = 31 * result + (passwordHashCode != null ? passwordHashCode.hashCode() : 0);
+        return result;
+    }
 }

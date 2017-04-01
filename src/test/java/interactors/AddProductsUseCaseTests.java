@@ -1,8 +1,8 @@
 package interactors;
 
+import beans.Product;
 import beans.builders.ProductBuilder;
 import entities.ProductEntity;
-import entities.builders.ProductEntityBuilder;
 import exceptions.UseCaseException;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,83 +32,53 @@ public class AddProductsUseCaseTests {
     @InjectMocks
     private AddProductUseCase addProductUseCase = new AddProductUseCase();
 
+    private Product product;
+
     @Before
     public void setup() {
         Mockito.doReturn(null)
                 .when(productRepository)
                 .findByCode(Matchers.anyString());
+        product = getValidProduct();
     }
 
     @Test(expected = UseCaseException.class)
     public void GivenProductWithInvalidCodeThenUseCaseExceptionShouldBeThrown() throws Exception {
-        addProductUseCase.execute(new ProductBuilder()
-                .setCode("1 23")
-                .setDescription("ABC")
-                .setPrice(BigDecimal.valueOf(1.5))
-                .setQuantityRemaining(0L)
-                .setQuantitySold(0L)
-                .build());
+        product.setCode("1 23");
+        addProductUseCase.execute(product);
     }
 
     @Test(expected = UseCaseException.class)
     public void GivenProductWithInvalidDescriptionThenUseCaseExceptionShouldBeThrown() throws Exception {
-        addProductUseCase.execute(new ProductBuilder()
-                .setCode("123")
-                .setDescription("###")
-                .setPrice(BigDecimal.valueOf(1.5))
-                .setQuantityRemaining(0L)
-                .setQuantitySold(0L)
-                .build());
+        product.setDescription("###");
+        addProductUseCase.execute(product);
     }
 
     @Test(expected = UseCaseException.class)
     public void GivenProductWithNoPriceThenUseCaseExceptionShouldBeThrown() throws Exception {
-        addProductUseCase.execute(new ProductBuilder()
-                .setCode("123")
-                .setDescription("ABC")
-                .setQuantityRemaining(0L)
-                .setQuantitySold(0L)
-                .build());
+        product.setPrice(null);
+        addProductUseCase.execute(product);
     }
 
     @Test(expected = UseCaseException.class)
     public void GivenProductWithNoQuantityRemainingThenUseCaseExceptionShouldBeThrown() throws Exception {
-        addProductUseCase.execute(new ProductBuilder()
-                .setCode("123")
-                .setDescription("ABC")
-                .setPrice(BigDecimal.valueOf(1.5))
-                .setQuantitySold(0L)
-                .build());
+        product.setQuantityRemaining(null);
+        addProductUseCase.execute(product);
     }
 
     @Test
     public void GivenProductWithNoQuantitySoldThenNoExceptionShouldBeThrown() throws Exception {
-        addProductUseCase.execute(new ProductBuilder()
-                .setCode("123")
-                .setDescription("ABC")
-                .setPrice(BigDecimal.valueOf(1.5))
-                .setQuantityRemaining(0L)
-                .build());
+        addProductUseCase.execute(product);
     }
 
     @Test(expected = UseCaseException.class)
     public void GivenProductWithCodeThatAlreadyExistsThenUseCaseExceptionShouldBeThrown() throws Exception {
-        Mockito.doReturn(new ProductEntityBuilder()
-                .setCode("123")
-                .setDescription("ABC")
-                .setPrice(BigDecimal.valueOf(1.5))
-                .setQuantityRemaining(0L)
-                .setQuantitySold(0L)
-                .build())
+        ProductEntity productEntity = product.convert();
+        productEntity.setQuantitySold(0L);
+        Mockito.doReturn(productEntity)
                 .when(productRepository)
                 .findByCode("123");
-        addProductUseCase.execute(new ProductBuilder()
-                .setCode("123")
-                .setDescription("ABC")
-                .setPrice(BigDecimal.valueOf(1.5))
-                .setQuantityRemaining(0L)
-                .setQuantitySold(0L)
-                .build());
+        addProductUseCase.execute(product);
     }
 
     @Test
@@ -118,36 +88,30 @@ public class AddProductsUseCaseTests {
             productEntities.add((ProductEntity) invocationOnMock.getArguments()[0]);
             return null;
         }).when(productRepository).save(Matchers.<ProductEntity>any());
-        addProductUseCase.execute(new ProductBuilder()
-                .setCode("123")
-                .setDescription("ABC")
-                .setPrice(BigDecimal.valueOf(1.5))
-                .setQuantityRemaining(0L)
-                .setQuantitySold(5L)
-                .build());
-        assertTrue(new ProductEntityBuilder()
-                .setCode("123")
-                .setDescription("ABC")
-                .setPrice(BigDecimal.valueOf(1.5))
-                .setQuantityRemaining(0L)
-                .setQuantitySold(0L)
-                .build()
-                .equals(productEntities.get(0)));
+        product.setQuantitySold(5L);
+        addProductUseCase.execute(product);
+        ProductEntity productEntity = product.convert();
+        productEntity.setQuantitySold(0L);
+        assertTrue(productEntity.equals(productEntities.get(0)));
     }
 
     @Test
-    public void GivenAValidProductThenExactlyOneProductEntityShouldBePersisted() throws Exception {
+    public void GivenValidProductThenExactlyOneProductEntityShouldBePersisted() throws Exception {
         List<ProductEntity> productEntities = new ArrayList<>();
         Mockito.doAnswer(invocationOnMock -> {
             productEntities.add((ProductEntity) invocationOnMock.getArguments()[0]);
             return null;
         }).when(productRepository).save(Matchers.<ProductEntity>any());
-        addProductUseCase.execute(new ProductBuilder()
+        addProductUseCase.execute(product);
+        assertEquals(1, productEntities.size());
+    }
+
+    public Product getValidProduct() {
+        return new ProductBuilder()
                 .setCode("123")
                 .setDescription("ABC")
                 .setPrice(BigDecimal.valueOf(1.5))
                 .setQuantityRemaining(0L)
-                .build());
-        assertEquals(1, productEntities.size());
+                .build();
     }
 }

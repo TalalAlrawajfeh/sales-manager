@@ -99,4 +99,42 @@ public class ReceiptEntity implements Serializable, Convertable<Receipt> {
                 .setDate(date)
                 .build();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ReceiptEntity that = (ReceiptEntity) o;
+        if (id != null ? !id.equals(that.id) : that.id != null) {
+            return false;
+        }
+        if (productEntity != null ? !productEntity.equals(that.productEntity) : that.productEntity != null) {
+            return false;
+        }
+        if (price != null ? !price.equals(that.price) : that.price != null) {
+            return false;
+        }
+        if (quantity != null ? !quantity.equals(that.quantity) : that.quantity != null) {
+            return false;
+        }
+        if (total != null ? !total.equals(that.total) : that.total != null) {
+            return false;
+        }
+        return date != null ? date.equals(that.date) : that.date == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (productEntity != null ? productEntity.hashCode() : 0);
+        result = 31 * result + (price != null ? price.hashCode() : 0);
+        result = 31 * result + (quantity != null ? quantity.hashCode() : 0);
+        result = 31 * result + (total != null ? total.hashCode() : 0);
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        return result;
+    }
 }

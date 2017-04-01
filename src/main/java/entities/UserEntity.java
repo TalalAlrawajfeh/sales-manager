@@ -62,4 +62,30 @@ public class UserEntity implements Serializable, Convertable<User> {
                 .setPasswordHashCode(passwordHashCode)
                 .build();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        UserEntity that = (UserEntity) o;
+        if (username != null ? !username.equals(that.username) : that.username != null) {
+            return false;
+        }
+        if (fullName != null ? !fullName.equals(that.fullName) : that.fullName != null) {
+            return false;
+        }
+        return passwordHashCode != null ? passwordHashCode.equals(that.passwordHashCode) : that.passwordHashCode == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = username != null ? username.hashCode() : 0;
+        result = 31 * result + (fullName != null ? fullName.hashCode() : 0);
+        result = 31 * result + (passwordHashCode != null ? passwordHashCode.hashCode() : 0);
+        return result;
+    }
 }
