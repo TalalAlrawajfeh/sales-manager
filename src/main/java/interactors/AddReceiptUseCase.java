@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import persistence.ProductRepository;
 import persistence.ReceiptRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -22,12 +25,12 @@ public class AddReceiptUseCase implements UseCase<Receipt> {
     @Autowired
     private ProductRepository productRepository;
 
-    private Map<Predicate<Receipt>, String> receiptsValidationsMessagesMap = new HashMap<>();
-
     private List<Pair<Predicate<Receipt>, String>> validations = new ArrayList<>();
 
     public AddReceiptUseCase() {
-        validations.add(new Pair<>(r -> Objects.nonNull(r.getProduct().getCode()) && r.getProduct().getCode().matches("[A-Z0-9]+"),
+        validations.add(new Pair<>(r -> Objects.nonNull(r.getProduct())
+                && Objects.nonNull(r.getProduct().getCode())
+                && r.getProduct().getCode().matches("[A-Z0-9]+"),
                 "The code field is not valid"));
         validations.add(new Pair<>(r -> Objects.nonNull(r.getPrice()),
                 "The price field is not valid"));
@@ -35,7 +38,8 @@ public class AddReceiptUseCase implements UseCase<Receipt> {
                 "The quantity field is not valid"));
         validations.add(new Pair<>(r -> Objects.nonNull(productRepository.findByCode(r.getProduct().getCode())),
                 "Product doesn't exist"));
-        validations.add(new Pair<>(r -> productRepository.findByCode(r.getProduct().getCode()).getQuantityRemaining() >= r.getQuantity(),
+        validations.add(new Pair<>(r -> productRepository.findByCode(r.getProduct().getCode()).getQuantityRemaining()
+                >= r.getQuantity(),
                 "Product quantity remaining is not sufficient"));
     }
 
@@ -55,13 +59,13 @@ public class AddReceiptUseCase implements UseCase<Receipt> {
     }
 
     private void validateReceipt(Receipt receipt) throws UseCaseException {
-        Optional<Pair<Predicate<Receipt>, String>> entry = validations
+        Optional<Pair<Predicate<Receipt>, String>> validationPair = validations
                 .stream()
                 .sequential()
                 .filter(p -> !p.getFirst().test(receipt))
                 .findAny();
-        if (entry.isPresent()) {
-            throw new UseCaseException(entry.get().getSecond());
+        if (validationPair.isPresent()) {
+            throw new UseCaseException(validationPair.get().getSecond());
         }
     }
 }

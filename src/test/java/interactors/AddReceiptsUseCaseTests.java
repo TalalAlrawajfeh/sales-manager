@@ -46,8 +46,20 @@ public class AddReceiptsUseCaseTests {
     }
 
     @Test(expected = UseCaseException.class)
+    public void GivenReceiptWithNoProductThenUseCaseExceptionShouldBeThrown() throws Exception {
+        receipt.setProduct(null);
+        addReceiptUseCase.execute(receipt);
+    }
+
+    @Test(expected = UseCaseException.class)
     public void GivenReceiptWithProductWithNoCodeThenUseCaseExceptionShouldBeThrown() throws Exception {
         receipt.getProduct().setCode(null);
+        addReceiptUseCase.execute(receipt);
+    }
+
+    @Test(expected = UseCaseException.class)
+    public void GivenReceiptWithProductWithInvalidCodeThenUseCaseExceptionShouldBeThrown() throws Exception {
+        receipt.getProduct().setCode("1 23");
         addReceiptUseCase.execute(receipt);
     }
 

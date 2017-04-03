@@ -12,6 +12,7 @@ import org.junit.runners.Suite;
         AddReceiptsUseCaseTests.class,
         DeleteProductUseCaseTests.class,
         DeleteReceiptsUseCaseTests.class,
+        EditProductUseCaseTests.class,
         ListReceiptsUseCaseTests.class
 })
 public class InteractorsTestSuite {

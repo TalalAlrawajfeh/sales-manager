@@ -22,9 +22,11 @@ public class AddProductUseCase implements UseCase<Product> {
     private Map<Predicate<Product>, String> productsValidationsMessagesMap = new HashMap<>();
 
     public AddProductUseCase() {
-        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getCode()) && p.getCode().matches("[A-Z0-9]+"),
+        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getCode())
+                        && p.getCode().matches("[A-Z0-9]+"),
                 "The code field is not valid");
-        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getDescription()) && p.getDescription().matches(".*[\\w]+.*"),
+        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getDescription())
+                        && p.getDescription().matches(".*[\\w]+.*"),
                 "The code field is not valid");
         productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getPrice()),
                 "The price field is not valid");
@@ -47,12 +49,12 @@ public class AddProductUseCase implements UseCase<Product> {
     }
 
     private void validateProduct(Product product) throws UseCaseException {
-        Optional<Map.Entry<Predicate<Product>, String>> entry = productsValidationsMessagesMap.entrySet()
+        Optional<Map.Entry<Predicate<Product>, String>> validationPair = productsValidationsMessagesMap.entrySet()
                 .stream()
                 .filter(e -> !e.getKey().test(product))
                 .findAny();
-        if (entry.isPresent()) {
-            throw new UseCaseException(entry.get().getValue());
+        if (validationPair.isPresent()) {
+            throw new UseCaseException(validationPair.get().getValue());
         }
     }
 }

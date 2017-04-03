@@ -4,6 +4,7 @@ import adapters.UseCase;
 import beans.Pair;
 import beans.Receipt;
 import entities.ProductEntity;
+import entities.ReceiptEntity;
 import exceptions.UseCaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import persistence.ProductRepository;
@@ -27,8 +28,24 @@ public class EditReceiptUseCase implements UseCase<Receipt> {
 
     private List<Pair<Predicate<Receipt>, String>> validations = new ArrayList<>();
 
+    private ReceiptEntity oldReceiptEntity;
+    private ProductEntity oldProductEntity;
+    private ProductEntity newProductEntity;
+
+    private Predicate<Receipt> isnNewProductQuantityRemainingSufficient = r -> {
+        oldReceiptEntity = receiptRepository.findById(r.getId());
+        oldProductEntity = productRepository.findByCode(oldReceiptEntity.getProductEntity().getCode());
+        newProductEntity = productRepository.findByCode(r.getProduct().getCode());
+        if (oldProductEntity.getCode().equals(newProductEntity.getCode())) {
+            return oldProductEntity.getQuantityRemaining() + oldReceiptEntity.getQuantity() >= r.getQuantity();
+        }
+        return newProductEntity.getQuantityRemaining() >= r.getQuantity();
+    };
+
     public EditReceiptUseCase() {
-        validations.add(new Pair<>(r -> Objects.nonNull(r.getProduct().getCode()) && r.getProduct().getCode().matches("[A-Z0-9]+"),
+        validations.add(new Pair<>(r -> Objects.nonNull(r.getProduct())
+                && Objects.nonNull(r.getProduct().getCode())
+                && r.getProduct().getCode().matches("[A-Z0-9]+"),
                 "The code field is not valid"));
         validations.add(new Pair<>(r -> Objects.nonNull(r.getPrice()),
                 "The price field is not valid"));
@@ -36,41 +53,41 @@ public class EditReceiptUseCase implements UseCase<Receipt> {
                 "The quantity field is not valid"));
         validations.add(new Pair<>(r -> Objects.nonNull(productRepository.findByCode(r.getProduct().getCode())),
                 "Product doesn't exist"));
-        validations.add(new Pair<>(r -> productRepository.findByCode(r.getProduct().getCode()).getQuantityRemaining() >= r.getQuantity(),
-                "Product quantity remaining is not sufficient"));
-        validations.add(new Pair<>(r -> Objects.isNull(r.getId()) || Objects.nonNull(receiptRepository.findById(r.getId())),
+        validations.add(new Pair<>(r -> Objects.nonNull(r.getId())
+                && Objects.nonNull(receiptRepository.findById(r.getId())),
                 "Invalid ID or receipt doesn't exist"));
+        validations.add(new Pair<>(isnNewProductQuantityRemainingSufficient,
+                "Product quantity remaining is not sufficient"));
     }
 
     @Override
     public void execute(Receipt receipt) throws UseCaseException {
         validateReceipt(receipt);
-        Receipt oldReceipt = receiptRepository.findById(receipt.getId()).convert();
-        receipt.setDate(oldReceipt.getDate());
+        receipt.setDate(oldReceiptEntity.getDate());
         receiptRepository.save(receipt.convert());
-        updateProducts(oldReceipt, receipt);
+        updateProducts(receipt);
     }
 
-    private void updateProducts(Receipt oldReceipt, Receipt newReceipt) {
-        updateOldProduct(oldReceipt);
+    private void updateProducts(Receipt newReceipt) {
+        updateOldProduct();
         updateNewProduct(newReceipt);
     }
 
     private void updateNewProduct(Receipt newReceipt) {
-        ProductEntity productEntity;
-        productEntity = productRepository.findByCode(newReceipt.getProduct().getCode());
         Long newQuantity = newReceipt.getQuantity();
-        productEntity.setQuantityRemaining(productEntity.getQuantityRemaining() - newQuantity);
-        productEntity.setQuantitySold(productEntity.getQuantitySold() + newQuantity);
-        productRepository.save(productEntity);
+        if (newProductEntity.getCode().equals(oldProductEntity.getCode())) {
+            newProductEntity = oldProductEntity;
+        }
+        newProductEntity.setQuantityRemaining(newProductEntity.getQuantityRemaining() - newQuantity);
+        newProductEntity.setQuantitySold(newProductEntity.getQuantitySold() + newQuantity);
+        productRepository.save(newProductEntity);
     }
 
-    private void updateOldProduct(Receipt oldReceipt) {
-        ProductEntity productEntity = productRepository.findByCode(oldReceipt.getProduct().getCode());
-        Long oldQuantity = oldReceipt.getQuantity();
-        productEntity.setQuantityRemaining(productEntity.getQuantityRemaining() + oldQuantity);
-        productEntity.setQuantitySold(productEntity.getQuantitySold() - oldQuantity);
-        productRepository.save(productEntity);
+    private void updateOldProduct() {
+        Long oldQuantity = oldReceiptEntity.getQuantity();
+        oldProductEntity.setQuantityRemaining(oldProductEntity.getQuantityRemaining() + oldQuantity);
+        oldProductEntity.setQuantitySold(oldProductEntity.getQuantitySold() - oldQuantity);
+        productRepository.save(oldProductEntity);
     }
 
     private void validateReceipt(Receipt receipt) throws UseCaseException {

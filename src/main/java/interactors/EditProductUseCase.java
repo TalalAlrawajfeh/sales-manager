@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import persistence.ProductRepository;
 import persistence.ReceiptRepository;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -26,12 +26,11 @@ public class EditProductUseCase implements UseCase<Pair<String, Product>> {
     private ReceiptRepository receiptRepository;
 
     private ProductEntity productEntity;
-    private Map<Predicate<Product>, String> productsValidationsMessagesMap = new HashMap<>();
-    private Map<Predicate<Pair<String, Product>>, String> repositoryValidationsMessagesMap = new HashMap<>();
+    private List<Pair<Predicate<Product>, String>> productValidations = new ArrayList<>();
+    private List<Pair<Predicate<Pair<String, Product>>, String>> repositoryValidations = new ArrayList<>();
 
     public EditProductUseCase() {
-        initializeProductsValidationsMessagesMap();
-        initializeRepositoryValidationsMessagesMap();
+        initializeValidations();
     }
 
     @Override
@@ -62,48 +61,45 @@ public class EditProductUseCase implements UseCase<Pair<String, Product>> {
     }
 
     private void doRepositoryValidations(Pair<String, Product> oldCodeProductPair) throws UseCaseException {
-        Optional<Map.Entry<Predicate<Pair<String, Product>>, String>> entry =
-                repositoryValidationsMessagesMap.entrySet()
-                        .stream()
-                        .filter(e -> !e.getKey().test(oldCodeProductPair))
-                        .findAny();
-        if (entry.isPresent()) {
-            throw new UseCaseException(entry.get().getValue());
+        Optional<Pair<Predicate<Pair<String, Product>>, String>> validationPair = repositoryValidations
+                .stream()
+                .sequential()
+                .filter(e -> !e.getFirst().test(oldCodeProductPair))
+                .findAny();
+        if (validationPair.isPresent()) {
+            throw new UseCaseException(validationPair.get().getSecond());
         }
     }
 
     private void validateProduct(Product product) throws UseCaseException {
-        Optional<Map.Entry<Predicate<Product>, String>> entry = productsValidationsMessagesMap.entrySet()
+        Optional<Pair<Predicate<Product>, String>> validationPair = productValidations
                 .stream()
-                .filter(e -> !e.getKey().test(product))
+                .sequential()
+                .filter(e -> !e.getFirst().test(product))
                 .findAny();
-        if (entry.isPresent()) {
-            throw new UseCaseException(entry.get().getValue());
+        if (validationPair.isPresent()) {
+            throw new UseCaseException(validationPair.get().getSecond());
         }
     }
 
-
-    private void initializeRepositoryValidationsMessagesMap() {
-        repositoryValidationsMessagesMap.put(p -> Objects.nonNull(productEntity),
-                "Product doesn't exist");
-        repositoryValidationsMessagesMap.put(p -> p.getFirst().equals(p.getSecond().getCode())
-                        || receiptRepository.findByProductEntity(productEntity).isEmpty(),
-                "There are receipts that depend on this product");
-        repositoryValidationsMessagesMap.put(p -> p.getFirst().equals(p.getSecond().getCode())
-                        || Objects.isNull(productRepository.findByCode(p.getSecond().getCode())),
-                "Another product with the same code already exists");
-    }
-
-    private void initializeProductsValidationsMessagesMap() {
-        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getCode())
-                        && p.getCode().matches("[A-Z0-9]+"),
-                "The code field is not valid");
-        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getDescription())
-                        && p.getCode().matches(".*[\\w]+.*"),
-                "The code field is not valid");
-        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getPrice()),
-                "The price field is not valid");
-        productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getQuantityRemaining()),
-                "The quantity field is not valid");
+    private void initializeValidations() {
+        productValidations.add(new Pair<>(p -> Objects.nonNull(p.getCode())
+                && p.getCode().matches("[A-Z0-9]+"),
+                "The code field is not valid"));
+        productValidations.add(new Pair<>(p -> Objects.nonNull(p.getDescription())
+                && p.getCode().matches(".*[\\w]+.*"),
+                "The code field is not valid"));
+        productValidations.add(new Pair<>(p -> Objects.nonNull(p.getPrice()),
+                "The price field is not valid"));
+        productValidations.add(new Pair<>(p -> Objects.nonNull(p.getQuantityRemaining()),
+                "The quantity field is not valid"));
+        repositoryValidations.add(new Pair<>(p -> Objects.nonNull(productEntity),
+                "Product doesn't exist"));
+        repositoryValidations.add(new Pair<>(p -> p.getFirst().equals(p.getSecond().getCode())
+                || receiptRepository.findByProductEntity(productEntity).isEmpty(),
+                "There are receipts that depend on this product"));
+        repositoryValidations.add(new Pair<>(p -> p.getFirst().equals(p.getSecond().getCode())
+                || Objects.isNull(productRepository.findByCode(p.getSecond().getCode())),
+                "Another product with the same code already exists"));
     }
 }
