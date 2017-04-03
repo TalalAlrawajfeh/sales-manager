@@ -44,11 +44,7 @@ public class EditProductUseCase implements UseCase<Pair<String, Product>> {
     }
 
     private void deleteOldProductEntity() throws UseCaseException {
-        try {
-            productRepository.delete(productEntity);
-        } catch (Exception e) {
-            throw new UseCaseException(e);
-        }
+        productRepository.delete(productEntity);
     }
 
     private void prepareAndValidateProduct(Pair<String, Product> oldCodeProductPair, Product product)

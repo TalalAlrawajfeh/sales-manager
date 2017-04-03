@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import persistence.ProductRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 /**
@@ -18,7 +19,10 @@ public class ListAllProductsUseCase implements UseCase<List<Product>> {
 
     @Override
     public void execute(List<Product> products) throws UseCaseException {
-        StreamSupport.stream(productRepository.findAll().spliterator(), true)
+        if (Objects.isNull(products)) {
+            throw new UseCaseException("Products parameter cannot be null");
+        }
+        StreamSupport.stream(productRepository.findAll().spliterator(), false)
                 .forEach(p -> products.add(p.convert()));
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import persistence.ReceiptRepository;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 /**
@@ -18,7 +19,10 @@ public class ListAllReceiptsUseCase implements UseCase<List<Receipt>> {
 
     @Override
     public void execute(List<Receipt> receipts) throws UseCaseException {
-        StreamSupport.stream(receiptRepository.findAll().spliterator(), Boolean.TRUE)
+        if (Objects.isNull(receipts)) {
+            throw new UseCaseException("Receipts parameter cannot be null");
+        }
+        StreamSupport.stream(receiptRepository.findAll().spliterator(), false)
                 .forEach(r -> receipts.add(r.convert()));
     }
 }

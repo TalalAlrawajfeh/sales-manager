@@ -11,7 +11,7 @@
 
     <bean id="loginUseCase" class="interactors.LoginUseCase"/>
     <bean id="listAllProductsUseCase" class="interactors.ListAllProductsUseCase"/>
-    <bean id="listAllReceiptsUseCase" class="interactors.ListAllReceiptsUseCase"/>
+    <bean id="listAllReceiptsUseCase" class="interactors.ListAllReceiptsUseCaseTests"/>
     <bean id="addProductUseCase" class="interactors.AddProductUseCase"/>
     <bean id="addReceiptUseCase" class="interactors.AddReceiptUseCase"/>
     <bean id="deleteProductUseCase" class="interactors.DeleteProductUseCase"/>
