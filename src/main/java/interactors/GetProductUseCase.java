@@ -19,7 +19,11 @@ public class GetProductUseCase implements UseCase<Map<GetProductsUseCaseParamete
 
     @Override
     public void execute(Map<GetProductsUseCaseParameters, Object> parametersMap) throws UseCaseException {
-        ProductEntity productEntity = productRepository.findByCode((String) parametersMap.get(GetProductsUseCaseParameters.PRODUCT_CODE));
+        String code = (String) parametersMap.get(GetProductsUseCaseParameters.PRODUCT_CODE);
+        if (Objects.isNull(code)) {
+            throw new UseCaseException("Product code parameter cannot be null");
+        }
+        ProductEntity productEntity = productRepository.findByCode(code);
         if (Objects.isNull(productEntity)) {
             throw new UseCaseException("Product doesn't exist");
         }
