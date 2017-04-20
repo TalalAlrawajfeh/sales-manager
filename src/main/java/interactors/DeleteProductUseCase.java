@@ -45,7 +45,7 @@ public class DeleteProductUseCase implements UseCase<Product> {
                 repositoryValidationsMessagesMap.entrySet()
                         .stream()
                         .filter(e -> !e.getKey().test(productEntity))
-                        .findAny();
+                        .findFirst();
         if (entry.isPresent()) {
             throw new UseCaseException(entry.get().getValue());
         }

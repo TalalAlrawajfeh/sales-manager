@@ -63,7 +63,7 @@ public class AddReceiptUseCase implements UseCase<Receipt> {
                 .stream()
                 .sequential()
                 .filter(p -> !p.getFirst().test(receipt))
-                .findAny();
+                .findFirst();
         if (validationPair.isPresent()) {
             throw new UseCaseException(validationPair.get().getSecond());
         }

@@ -95,7 +95,7 @@ public class EditReceiptUseCase implements UseCase<Receipt> {
                 .stream()
                 .sequential()
                 .filter(p -> !p.getFirst().test(receipt))
-                .findAny();
+                .findFirst();
         if (entry.isPresent()) {
             throw new UseCaseException(entry.get().getSecond());
         }
