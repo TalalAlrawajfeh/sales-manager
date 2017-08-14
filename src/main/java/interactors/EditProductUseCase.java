@@ -61,7 +61,7 @@ public class EditProductUseCase implements UseCase<Pair<String, Product>> {
                 .stream()
                 .sequential()
                 .filter(e -> !e.getFirst().test(oldCodeProductPair))
-                .findFirst();
+                .findAny();
         if (validationPair.isPresent()) {
             throw new UseCaseException(validationPair.get().getSecond());
         }
@@ -72,7 +72,7 @@ public class EditProductUseCase implements UseCase<Pair<String, Product>> {
                 .stream()
                 .sequential()
                 .filter(e -> !e.getFirst().test(product))
-                .findFirst();
+                .findAny();
         if (validationPair.isPresent()) {
             throw new UseCaseException(validationPair.get().getSecond());
         }
@@ -83,8 +83,8 @@ public class EditProductUseCase implements UseCase<Pair<String, Product>> {
                 && p.getCode().matches("[A-Z0-9]+"),
                 "The code field is not valid"));
         productValidations.add(new Pair<>(p -> Objects.nonNull(p.getDescription())
-                && p.getDescription().matches(".*\\w+.*"),
-                "The description field is not valid"));
+                && p.getCode().matches(".*[\\w]+.*"),
+                "The code field is not valid"));
         productValidations.add(new Pair<>(p -> Objects.nonNull(p.getPrice()),
                 "The price field is not valid"));
         productValidations.add(new Pair<>(p -> Objects.nonNull(p.getQuantityRemaining()),

@@ -4,9 +4,7 @@ import beans.Product;
 import entities.ProductEntity;
 import entities.builders.ProductEntityBuilder;
 import exceptions.UseCaseException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,12 +30,8 @@ public class ListAllProductsUseCaseTests {
     @InjectMocks
     private ListAllProductsUseCase listAllProductsUseCase = new ListAllProductsUseCase();
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
-    @Test
+    @Test(expected = UseCaseException.class)
     public void GivenNullProductsListThenUseCaseExceptionShouldBeThrown() throws UseCaseException {
-        expectUseCaseException("Products parameter cannot be null");
         listAllProductsUseCase.execute(null);
     }
 
@@ -53,10 +47,5 @@ public class ListAllProductsUseCaseTests {
         assertEquals(2, products.size());
         assertTrue(products.contains(firstProductEntity.convert()));
         assertTrue(products.contains(secondProductEntity.convert()));
-    }
-
-    private void expectUseCaseException(String expectedMessage) {
-        expectedException.expect(UseCaseException.class);
-        expectedException.expectMessage(expectedMessage);
     }
 }

@@ -4,13 +4,12 @@ import beans.Receipt;
 import beans.builders.ProductBuilder;
 import beans.builders.ReceiptBuilder;
 import entities.ProductEntity;
+import entities.ReceiptEntity;
 import entities.builders.ProductEntityBuilder;
 import entities.builders.ReceiptEntityBuilder;
 import exceptions.UseCaseException;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -42,17 +41,13 @@ public class DeleteReceiptsUseCaseTests {
 
     private Receipt receipt;
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     @Before
     public void setup() {
         receipt = getValidReceipt();
     }
 
-    @Test
+    @Test(expected = UseCaseException.class)
     public void GivenReceiptThatDoesNotExistThenUseCaseExceptionShouldBeThrown() throws Exception {
-        expectUseCaseException("Receipt doesn't exist");
         Mockito.doReturn(null)
                 .when(receiptRepository)
                 .findById(1L);
@@ -80,7 +75,7 @@ public class DeleteReceiptsUseCaseTests {
                 productEntities.get(0));
     }
 
-    private Receipt getValidReceipt() {
+    public Receipt getValidReceipt() {
         return new ReceiptBuilder()
                 .setId(1L)
                 .setProduct(new ProductBuilder().setCode("123").build())
@@ -88,10 +83,5 @@ public class DeleteReceiptsUseCaseTests {
                 .setQuantity(1L)
                 .setTotal(BigDecimal.valueOf(1.5))
                 .build();
-    }
-
-    private void expectUseCaseException(String expectedMessage) {
-        expectedException.expect(UseCaseException.class);
-        expectedException.expectMessage(expectedMessage);
     }
 }

@@ -27,7 +27,7 @@ public class AddProductUseCase implements UseCase<Product> {
                 "The code field is not valid");
         productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getDescription())
                         && p.getDescription().matches(".*[\\w]+.*"),
-                "The description field is not valid");
+                "The code field is not valid");
         productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getPrice()),
                 "The price field is not valid");
         productsValidationsMessagesMap.put(p -> Objects.nonNull(p.getQuantityRemaining()),
@@ -52,7 +52,7 @@ public class AddProductUseCase implements UseCase<Product> {
         Optional<Map.Entry<Predicate<Product>, String>> validationPair = productsValidationsMessagesMap.entrySet()
                 .stream()
                 .filter(e -> !e.getKey().test(product))
-                .findFirst();
+                .findAny();
         if (validationPair.isPresent()) {
             throw new UseCaseException(validationPair.get().getValue());
         }

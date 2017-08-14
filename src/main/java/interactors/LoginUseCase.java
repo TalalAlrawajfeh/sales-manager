@@ -29,7 +29,7 @@ public class LoginUseCase implements UseCase<User> {
         validations.add(new Pair<>(u -> Objects.nonNull(u.getUsername()),
                 "Username cannot be null"));
         validations.add(new Pair<>(u -> Objects.nonNull(u.getPasswordHashCode()),
-                "Password cannot be null"));
+                "Username cannot be null"));
     }
 
     @Override

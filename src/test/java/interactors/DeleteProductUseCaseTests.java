@@ -1,13 +1,12 @@
 package interactors;
 
+import beans.Product;
 import beans.builders.ProductBuilder;
 import entities.ProductEntity;
 import entities.ReceiptEntity;
 import entities.builders.ProductEntityBuilder;
 import exceptions.UseCaseException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -20,6 +19,7 @@ import persistence.ReceiptRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
@@ -38,19 +38,14 @@ public class DeleteProductUseCaseTests {
     @InjectMocks
     private DeleteProductUseCase deleteProductUseCase = new DeleteProductUseCase();
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
-    @Test
+    @Test(expected = UseCaseException.class)
     public void GivenProductThatDoesNotExistThenUseCaseExceptionShouldBeThrown() throws Exception {
-        expectUseCaseException("Product doesn't exit");
         Mockito.doReturn(null).when(productRepository).findByCode("123");
         deleteProductUseCase.execute(new ProductBuilder().setCode("123").build());
     }
 
-    @Test
+    @Test(expected = UseCaseException.class)
     public void GivenProductWithReceiptChildThenUseCaseExceptionShouldBeThrown() throws Exception {
-        expectUseCaseException("There are receipts that depend on this product");
         ProductEntity productEntity = getProductEntity();
         Mockito.doReturn(productEntity).when(productRepository).findByCode("123");
         Mockito.doReturn(Arrays.asList(new ReceiptEntity())).when(receiptRepository).findByProductEntity(productEntity);
@@ -78,10 +73,5 @@ public class DeleteProductUseCaseTests {
                 .setPrice(BigDecimal.valueOf(1.5))
                 .setQuantityRemaining(0L)
                 .build();
-    }
-
-    private void expectUseCaseException(String expectedMessage) {
-        expectedException.expect(UseCaseException.class);
-        expectedException.expectMessage(expectedMessage);
     }
 }
