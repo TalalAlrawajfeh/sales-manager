@@ -3,6 +3,10 @@ sales-manager.iml
 .idea/*
 .idea/**
 .idea/**/*
+deploy
+deploy/*
+deploy/**
+deploy/**/*
 target
 target/*
 target/**
