@@ -4,7 +4,9 @@ import beans.Receipt;
 import entities.ReceiptEntity;
 import entities.builders.ReceiptEntityBuilder;
 import exceptions.UseCaseException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,8 +32,12 @@ public class ListAllReceiptsUseCaseTests {
     @InjectMocks
     private ListAllReceiptsUseCase listAllReceiptsUseCase = new ListAllReceiptsUseCase();
 
-    @Test(expected = UseCaseException.class)
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
+    @Test
     public void GivenNullReceiptsListThenUseCaseExceptionShouldBeThrown() throws UseCaseException {
+        expectUseCaseException("Receipts parameter cannot be null");
         listAllReceiptsUseCase.execute(null);
     }
 
@@ -49,4 +55,8 @@ public class ListAllReceiptsUseCaseTests {
         assertTrue(receipts.contains(secondReceiptEntity.convert()));
     }
 
+    private void expectUseCaseException(String expectedMessage) {
+        expectedException.expect(UseCaseException.class);
+        expectedException.expectMessage(expectedMessage);
+    }
 }

@@ -5,7 +5,9 @@ import entities.ProductEntity;
 import entities.builders.ProductEntityBuilder;
 import exceptions.UseCaseException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,19 +33,24 @@ public class GetProductUseCaseTests {
 
     private Map<GetProductsUseCaseParameters, Object> parametersMap;
 
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
     @Before
     public void setup() {
         parametersMap = new HashMap<>();
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenParametersMapWithNoProductCodeThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("Product code parameter cannot be null");
         parametersMap.put(GetProductsUseCaseParameters.PRODUCT_CODE, null);
         getProductUseCase.execute(parametersMap);
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenParametersMapWithProductCodeThatDoesNotExistThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("Product doesn't exist");
         parametersMap.put(GetProductsUseCaseParameters.PRODUCT_CODE, "123");
         Mockito.doReturn(null).when(productRepository).findByCode("123");
         getProductUseCase.execute(parametersMap);
@@ -56,5 +63,10 @@ public class GetProductUseCaseTests {
         Mockito.doReturn(productEntity).when(productRepository).findByCode("123");
         getProductUseCase.execute(parametersMap);
         assertEquals(productEntity.convert(), parametersMap.get(GetProductsUseCaseParameters.PRODUCT));
+    }
+
+    private void expectUseCaseException(String expectedMessage) {
+        expectedException.expect(UseCaseException.class);
+        expectedException.expectMessage(expectedMessage);
     }
 }

@@ -8,7 +8,9 @@ import entities.ReceiptEntity;
 import entities.builders.ProductEntityBuilder;
 import exceptions.UseCaseException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
@@ -40,49 +42,59 @@ public class AddReceiptsUseCaseTests {
 
     private Receipt receipt;
 
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
     @Before
     public void setup() {
         receipt = getValidReceipt();
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenReceiptWithNoProductThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("The code field is not valid");
         receipt.setProduct(null);
         addReceiptUseCase.execute(receipt);
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenReceiptWithProductWithNoCodeThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("The code field is not valid");
         receipt.getProduct().setCode(null);
         addReceiptUseCase.execute(receipt);
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenReceiptWithProductWithInvalidCodeThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("The code field is not valid");
         receipt.getProduct().setCode("1 23");
         addReceiptUseCase.execute(receipt);
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenReceiptWithNoPriceThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("The price field is not valid");
         receipt.setPrice(null);
         addReceiptUseCase.execute(receipt);
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenReceiptWithNoQuantityThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("The quantity field is not valid");
         receipt.setQuantity(null);
         addReceiptUseCase.execute(receipt);
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenReceiptWithProductThatDoesNotExistThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("Product doesn't exist");
         Mockito.doReturn(null).when(productRepository).findByCode("123");
         addReceiptUseCase.execute(receipt);
     }
 
-    @Test(expected = UseCaseException.class)
+    @Test
     public void GivenReceiptWithQuantityNotSufficientWithRespectToProductQuantityRemainingThenUseCaseExceptionShouldBeThrown() throws Exception {
+        expectUseCaseException("Product quantity remaining is not sufficient");
         Mockito.doReturn(new ProductEntityBuilder()
                 .setQuantityRemaining(0L)
                 .build())
@@ -118,7 +130,7 @@ public class AddReceiptsUseCaseTests {
         assertEquals(expectedProductEntity, productEntities.get(0));
     }
 
-    public Receipt getValidReceipt() {
+    private Receipt getValidReceipt() {
         return new ReceiptBuilder()
                 .setProduct(new ProductBuilder().setCode("123").build())
                 .setDate("01-01-2017 00:00:00")
@@ -126,5 +138,10 @@ public class AddReceiptsUseCaseTests {
                 .setQuantity(1L)
                 .setTotal(BigDecimal.valueOf(1.5))
                 .build();
+    }
+
+    private void expectUseCaseException(String expectedMessage) {
+        expectedException.expect(UseCaseException.class);
+        expectedException.expectMessage(expectedMessage);
     }
 }
